@@ -2,15 +2,15 @@ import { Component } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 
-const modalRoot = document.querySelector('#modal-root');
+const modalRoot = document.querySelector('modalRoot');
 
 class Modal extends Component {
   componentDidMount() {
-    window.addEventListener('keydown', this.handleKeyDown);
+    document.addEventListener('keydown', this.handleKeyDown);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this.handleKeyDown);
+    document.removeEventListener('keydown', this.handleKeyDown);
   }
   handleKeyDown = e => {
     if (e.target === e.currentTarget || e.code === 'Escape')
@@ -18,8 +18,8 @@ class Modal extends Component {
   };
   render() {
     return createPortal(
-      <div className="overlay" onClick={this.handleKeyDown()}>
-        <div className="modal">
+      <div className="overlay" onClick={this.handleKeyDown}>
+        <div className="modalRoot">
           <img src={this.props.src} alt={this.props.alt} />
         </div>
       </div>,
@@ -31,4 +31,5 @@ class Modal extends Component {
 Modal.propTypes = {
   toggleModal: PropTypes.func.isRequired,
 };
+
 export default Modal;

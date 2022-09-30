@@ -1,14 +1,15 @@
-import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
+import React from 'react';
 import PropTypes from 'prop-types';
+import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 
-const ImageGallery = ({ images }) => {
+const ImageGallery = ({ items, openModal }) => {
   return (
     <ul className="gallery">
-      {images.map(({ id, webformatURL, largeImageURL }) => (
+      {items.map(item => (
         <ImageGalleryItem
-          key={id}
-          webformatURL={webformatURL}
-          largeImageURL={largeImageURL}
+          key={Math.random().toString(36).substr(2, 9)}
+          itemData={item}
+          openModal={openModal}
         />
       ))}
     </ul>

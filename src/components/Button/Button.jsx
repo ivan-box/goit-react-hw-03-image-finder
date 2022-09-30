@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types';
+import React from 'react';
 
-const Button = onClick => {
+const Button = ({ pageUpdate }) => {
   return (
-    <button type="button" onClick={onClick}>
+    <button type="button" onClick={pageUpdate}>
       Load more
     </button>
   );
 };
 Button.propTypes = {
-  onClick: PropTypes.func,
+  pageUpdate: PropTypes.func,
 };
 export default Button;

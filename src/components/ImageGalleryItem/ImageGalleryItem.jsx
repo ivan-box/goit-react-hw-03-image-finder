@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Modal } from '../Modal/Modal';
+import Modal from '../Modal/Modal';
 
 class ImageGalleryItem extends Component {
   state = {
@@ -10,14 +10,14 @@ class ImageGalleryItem extends Component {
     this.setState(({ showModal }) => ({ showModal: !showModal }));
 
   render() {
-    const { showModal } = this.state;
+    const { showModal, webformatURL, tags } = this.state;
     return (
       <>
         <li className="gallery-item">
           <img
             className="gallery-image"
-            src={this.props.webformatURL}
-            alt={this.props.tags}
+            src={webformatURL}
+            alt={tags}
             onClick={this.toggleModal}
           />
         </li>

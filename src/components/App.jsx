@@ -1,51 +1,100 @@
 // import axios from 'axios';
 import { Component } from 'react';
+import ImageGallery from '../components/ImageGallery/ImageGallery';
+import { fetchGallery } from '../services/Api/Api';
+import Searchbar from '../components/Searchbar/Searchbar';
+import Button from '../components/Button/Button';
+import Modal from '../components/Modal/Modal';
+import Loader from '../components/Loader/Loader';
+import { ToastContainer } from 'react-toastify';
+
 export class App extends Component {
-  render() {
-    return (
-      <div>
-      
-      </div>)
-  }
-}
-
-
-
-/* 
-
-import axios from 'axios';
-import Notiflix from 'notiflix';
-
-export async function getImage(inputValue, currentPage = 1, perPage = 40) {
-  let options = {
-    params: {
-      key: '29479728-a98d2355de22f92bb93dea3e0',
-      q: inputValue,
-      image_type: 'photo',
-      orientation: 'horizontal',
-      safesearch: true,
-      page: currentPage,
-      per_page: perPage,
-    },
+  state = {
+    images: [],
+    searchQuery: '',
+    page: 1,
+    loading: false,
+    error: null,
+    foundImages: null,
+    currentLargeImg: null,
   };
-  const response = await axios.get('https://pixabay.com/api/', options);
+  setInitialParams = searchQuery => {
+    if (searchQuery === '') {
+      return alert('Enter the search value!');
+    }
 
-  if (response.data.hits.length === 0) {
-    return Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
+    if (searchQuery === this.state.searchQuery) {
+      return;
+    }
+
+    this.setState({
+      images: [],
+      searchQuery,
+      page: 1,
+    });
+  };
+  pageUpdate = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
+  };
+  addImages = async (searchQuery, page) => {
+    this.setState({ loading: true });
+
+    try {
+      const data = await fetchGallery(searchQuery, page);
+      const { hits: newImages, totalHits: foundImages } = data;
+
+      this.setState(oldState => ({
+        images: [...oldState.images, ...newImages],
+      }));
+
+      if (foundImages !== this.state.foundImages) {
+        this.setState({ foundImages });
+      }
+    } catch (error) {
+      this.setState({ error });
+    } finally {
+      this.setState({ loading: false });
+    }
+  };
+  openModal = (src, alt) => {
+    this.setState(state => ({ ...state, currentLargeImg: { src, alt } }));
+  };
+
+  closeModal = e => {
+    this.setState({ currentLargeImg: null });
+  };
+  componentDidUpdate(prevProps, prevState) {
+    const { searchQuery, page } = this.state;
+
+    if (prevState.searchQuery !== searchQuery || prevState.page !== page) {
+      this.setState({ loading: true });
+      this.addImages(searchQuery, page);
+    }
+  }
+
+  render() {
+    const { images, loading, error, foundImages, currentLargeImg } = this.state;
+
+    return (
+      <>
+        <Searchbar onSubmit={this.setInitialParams} />
+        {error && <p>Whoops, something went wrong: {error.message}</p>}
+        {images.length > 0 && (
+          <>
+            <ImageGallery items={images} openModal={this.openModal} />
+            {images.length < foundImages && (
+              <Button pageUpdate={this.pageUpdate} />
+            )}
+          </>
+        )}
+        {currentLargeImg && (
+          <Modal closeModal={this.closeModal} imgData={currentLargeImg} />
+        )}
+        {loading && <Loader />}
+
+        <ToastContainer autoClose={3000} />
+      </>
     );
   }
-
-  return response.data;
 }
-// {/* axios.defoults.baseURL='https://pixabay.com/api/?key=29479728-a98d2355de22f92bb93dea3e0&q=yellow+flowers&image_type=photo&pretty=true' */}
-      // {/* https://pixabay.com/api/?q=cat&page=1&key=your_key&image_type=photo&orientation=horizontal&per_page=12 */}
-      // {/* id - унікальний ідентифікатор
-      // webformatURL - посилання на маленьке
-      // зображення для списку карток
-      // largeImageURL - посилання на велике
-      // зображення для модального вікна React homework template */}
-      // {/* <Searchbar />
-      // <ImageGalleryItem />
-      // <ImageGallery />
-      // <Modal /> */}
+export default App;
